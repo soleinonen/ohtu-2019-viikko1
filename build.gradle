@@ -38,3 +38,12 @@ jar {
         attributes 'Main-Class': 'ohtu.ohtuvarasto.Main'
     }
 }
+
+// For codecov
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}
+
