@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 public class VarastoTest {
 
     Varasto varasto;
+    Varasto saldollinenVarasto;
     double vertailuTarkkuus = 0.0001;
 
     @Before
@@ -23,6 +24,36 @@ public class VarastoTest {
     @Test
     public void konstruktoriLuoTyhjanVaraston() {
         assertEquals(0, varasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void konstruktoriLuoVarastonOikeinNollatilavuudella() {
+    	Varasto virheellinenVarasto = new Varasto(-1);
+    	assertEquals(0, virheellinenVarasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void konstruktoriLuoVarastonSaldolla() {
+    	Varasto saldollinenVarasto = new Varasto(10,5);
+    	assertEquals(5, saldollinenVarasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void konstruktoriKasitteleeNegatiivisenSaldonOikein() {
+    	Varasto saldollinenVarasto = new Varasto(10,-5);
+    	assertEquals(0, saldollinenVarasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void konstruktoriSaldollallaLuoVarastonNegatiivisellaTilavuudella() {
+    	Varasto saldollinenVarasto = new Varasto(-1,0);
+    	assertEquals(0, saldollinenVarasto.getTilavuus(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void konstruktorissaLisaysYlimaarainenHukkaan() {
+    	Varasto saldollinenVarasto = new Varasto(5, 10);
+    	assertEquals(5, saldollinenVarasto.getSaldo(), vertailuTarkkuus);
     }
 
     @Test
@@ -36,6 +67,22 @@ public class VarastoTest {
 
         // saldon pitäisi olla sama kun lisätty määrä
         assertEquals(8, varasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void negatiivinenLisaysEiTeeMitaan() {
+    	varasto.lisaaVarastoon(-1);
+    	
+    	// saldon pitäisi pysyä samana jos yritetään lisätä negatiivinen määrä
+    	assertEquals(0, varasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void ylimaarainenMeneeHukkaanLisayksessa() {
+    	varasto.lisaaVarastoon(12);
+    	
+    	// Saldon pitäisi olla maksimi kun lisätään varastoon enemmän kuin mitä kapasiteetti
+    	assertEquals(10, varasto.getSaldo(), vertailuTarkkuus);
     }
 
     @Test
@@ -63,6 +110,32 @@ public class VarastoTest {
 
         // varastossa pitäisi olla tilaa 10 - 8 + 2 eli 4
         assertEquals(4, varasto.paljonkoMahtuu(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void negatiivinenOttaminenPitaaSaldonEnnallaan() {
+    	varasto.lisaaVarastoon(10);
+    	varasto.otaVarastosta(-200);
+    	assertEquals(10, varasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void yliSaldonOttaminenPalauttaaOikeanMaaran() {
+    	varasto.lisaaVarastoon(10);
+    	double palautettu = varasto.otaVarastosta(100);
+    	assertEquals(10, palautettu, vertailuTarkkuus);
+    }
+    
+    @Test
+    public void yliSaldonOttaminenNollaaSaldon() {
+    	varasto.lisaaVarastoon(10);
+    	varasto.otaVarastosta(100);
+    	assertEquals(0, varasto.getSaldo(), vertailuTarkkuus);
+    }
+    
+    @Test
+    public void merkkijononTulostus() {
+    	assertEquals("saldo = 0.0, vielä tilaa 10.0", varasto.toString());
     }
 
 }
